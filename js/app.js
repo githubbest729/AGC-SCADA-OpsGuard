@@ -294,19 +294,21 @@ async function renderPmRun(runId) {
       </div>
     </div>
 
-    <!-- NEW: Photo Evidence Panel -->
+   <!-- Photo Evidence Panel with Direct File Input Overlay -->
     <div class="panel mb-16">
       <div class="panel-head"><h3>Photo Evidence</h3></div>
       <div class="panel-body">
         <div id="photoPreviewContainer" style="margin-bottom: 12px; ${run.photoBase64 ? '' : 'display:none;'}">
           <img id="photoPreview" src="${run.photoBase64 || ''}" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid var(--border);" />
         </div>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
-        <button class="btn btn--ghost" id="btnCapturePhoto">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span id="btnCaptureText">${run.photoBase64 ? 'Retake Photo' : 'Capture Photo'}</span>
-        </button>
-        <button class="btn btn--danger btn--ghost" id="btnClearPhoto" style="${run.photoBase64 ? '' : 'display:none;'}">Remove</button>
+        <div style="position: relative; display: inline-block;">
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
+          <button class="btn btn--ghost" id="btnCapturePhoto" type="button" style="pointer-events: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span id="btnCaptureText">${run.photoBase64 ? 'Retake Photo' : 'Capture Photo'}</span>
+          </button>
+        </div>
+        <button class="btn btn--danger btn--ghost" id="btnClearPhoto" style="${run.photoBase64 ? '' : 'display:none;'} margin-left: 8px;">Remove</button>
       </div>
     </div>
 
