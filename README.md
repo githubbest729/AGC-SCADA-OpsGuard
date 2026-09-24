@@ -43,9 +43,14 @@ erDiagram
     EQUIPMENT ||--o{ VERSIONS : tracks
     EQUIPMENT ||--o{ LICENSES : holds
     EQUIPMENT ||--o{ BACKUPS : verified_by
+    PM_TEMPLATES ||--o{ PM_RUNS : instantiates
+    SECURITY_CHECKS ||--o{ SECURITY_RUNS : guides
+```
 
+---
 
-💻 Tech Stack & Folder Structure
+## 💻 Tech Stack & Folder Structure
+
 Frontend: Vanilla JavaScript, HTML5, CSS3 (No build step, no framework).
 
 Storage: IndexedDB for secure, local offline data.
