@@ -106,7 +106,6 @@ async function refreshNavBadges() {
   if (expiring > 0) { licBadge.style.display = "inline-block"; licBadge.textContent = expiring; }
   else licBadge.style.display = "none";
 
-  // --- NEW: Update the Native OS PWA Badge dynamically ---
   if (typeof AppBadge !== 'undefined') {
     AppBadge.update();
   }
@@ -261,6 +260,7 @@ async function startPmRun(templateId) {
     status: "in_progress",
     checks: {},
     remarks: "",
+    photoBase64: null, // NEW: Field to hold the captured photo
     engineer: APP_SETTINGS.engineerName
   };
   await OpsDB.put("pmRuns", run);
@@ -294,6 +294,22 @@ async function renderPmRun(runId) {
       </div>
     </div>
 
+    <!-- NEW: Photo Evidence Panel -->
+    <div class="panel mb-16">
+      <div class="panel-head"><h3>Photo Evidence</h3></div>
+      <div class="panel-body">
+        <div id="photoPreviewContainer" style="margin-bottom: 12px; ${run.photoBase64 ? '' : 'display:none;'}">
+          <img id="photoPreview" src="${run.photoBase64 || ''}" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid var(--border);" />
+        </div>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
+        <button class="btn btn--ghost" id="btnCapturePhoto">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span id="btnCaptureText">${run.photoBase64 ? 'Retake Photo' : 'Capture Photo'}</span>
+        </button>
+        <button class="btn btn--danger btn--ghost" id="btnClearPhoto" style="${run.photoBase64 ? '' : 'display:none;'}">Remove</button>
+      </div>
+    </div>
+
     <div class="panel mb-16">
       <div class="panel-head"><h3>Remarks / anomalies found</h3></div>
       <div class="panel-body">
@@ -308,6 +324,7 @@ async function renderPmRun(runId) {
     </div>
   `;
 
+  // Checklist progress handler
   $view.querySelectorAll("[data-check-idx]").forEach((cb) =>
     cb.addEventListener("change", (e) => {
       const idx = e.target.dataset.checkIdx;
@@ -319,6 +336,67 @@ async function renderPmRun(runId) {
     })
   );
 
+  // NEW: Camera & Image compression logic
+  const cameraInput = document.getElementById("cameraInput");
+  const btnCapture = document.getElementById("btnCapturePhoto");
+  const btnClear = document.getElementById("btnClearPhoto");
+  const previewContainer = document.getElementById("photoPreviewContainer");
+  const previewImg = document.getElementById("photoPreview");
+  const captureText = document.getElementById("btnCaptureText");
+
+  btnCapture.addEventListener("click", () => cameraInput.click());
+
+  cameraInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Shrink the image to max 800px width so IndexedDB doesn't get bloated
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert back to base64 JPEG at 80% quality
+        const base64Str = canvas.toDataURL("image/jpeg", 0.8);
+        run.photoBase64 = base64Str;
+
+        // Update the UI
+        previewImg.src = base64Str;
+        previewContainer.style.display = "block";
+        btnClear.style.display = "inline-block";
+        captureText.textContent = "Retake Photo";
+        
+        OpsDB.put("pmRuns", run); // Auto-save when picture is taken
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  btnClear.addEventListener("click", () => {
+    run.photoBase64 = null;
+    previewImg.src = "";
+    previewContainer.style.display = "none";
+    btnClear.style.display = "none";
+    captureText.textContent = "Capture Photo";
+    OpsDB.put("pmRuns", run);
+  });
+
+  // Action Buttons
   document.getElementById("btnSaveRun").addEventListener("click", async () => {
     run.remarks = document.getElementById("runRemarks").value;
     await OpsDB.put("pmRuns", run);
@@ -342,11 +420,15 @@ async function renderPmRun(runId) {
   });
 }
 
+// NEW: Updated to embed the photo in the PDF
 async function exportPmRunPdf(run, template) {
   const stepsHtml = PdfExport.checklistToHtml(template.steps.map((s, i) => ({ id: i, text: s })), run.checks);
+  const photoHtml = run.photoBase64 ? `<div style="margin-top:16px;"><strong>Photo Evidence:</strong><br/><img src="${run.photoBase64}" style="max-width: 320px; max-height: 400px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px;" /></div>` : '';
+  
   const body = `
     ${stepsHtml}
     <div style="margin-top:16px;"><strong>Remarks / anomalies:</strong><div style="margin-top:4px; white-space:pre-wrap;">${esc(run.remarks) || "None recorded."}</div></div>
+    ${photoHtml}
   `;
   const html = PdfExport.buildLetterhead({
     plantName: APP_SETTINGS.plantName,
@@ -374,7 +456,7 @@ async function renderPmHistory() {
               <td><span class="tag">${esc(FREQ_LABEL[r.frequency] || r.frequency)}</span></td>
               <td class="mono">${fmtDateTime(r.completedAt)}</td>
               <td>${esc(r.engineer)}</td>
-              <td>${r.remarks ? `<span class="tag warn">Noted</span>` : `<span class="tag ok">Clean</span>`}</td>
+              <td>${r.remarks || r.photoBase64 ? `<span class="tag warn">Noted/Photo</span>` : `<span class="tag ok">Clean</span>`}</td>
               <td class="text-right"><button class="btn btn--sm" data-reexport="${r.id}">Export PDF</button></td>
             </tr>`).join("")}
         </tbody>
