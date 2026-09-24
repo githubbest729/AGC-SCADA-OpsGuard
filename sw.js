@@ -1,6 +1,7 @@
-/* AGC SCADA OpsGuard — Service Worker
-   App-shell precache + stale-while-revalidate runtime caching so field
-   engineers can open and run checklists with zero connectivity. */
+/* ==========================================================================
+   AGC SCADA OpsGuard — Service Worker
+   App-shell precache + runtime caching for offline field checklists.
+   ========================================================================== */
 
 const CACHE_VERSION = "opsguard-v1.0.0";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
@@ -39,27 +40,17 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Strategy:
-// - Navigation requests: network-first, falling back to cached shell / offline.html
-// - Same-origin static assets: cache-first
-// - Cross-origin (e.g. CDN html2pdf, Google Fonts): stale-while-revalidate, best-effort
 self.addEventListener('fetch', (event) => {
-  // IGNORE non-http requests (like browser extensions, chrome-extension://, etc.)
-  if (!event.request.url.startsWith('http')) {
+  const request = event.request;
+
+  // 1. Ignore non-http requests (e.g., chrome-extension://)
+  if (!request.url.startsWith('http')) {
     return;
   }
 
-  // Your existing cache/fetch handling logic below...
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).then((networkResponse) => {
-        // Optional caching logic
-        return networkResponse;
-      });
-    })
-  );
-});
+  const url = new URL(request.url);
 
+  // 2. Same-origin static assets: cache-first with fallback to network
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(request).then(
@@ -75,13 +66,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cross-origin: stale-while-revalidate, never block on network
+  // 3. Cross-origin (CDNs, fonts, html2pdf): stale-while-revalidate
   event.respondWith(
     caches.open(RUNTIME_CACHE).then(async (cache) => {
       const cached = await cache.match(request);
       const networkFetch = fetch(request)
         .then((response) => {
-          if (response && response.status === 200) cache.put(request, response.clone());
+          if (response && response.status === 200) {
+            cache.put(request, response.clone());
+          }
           return response;
         })
         .catch(() => cached);
