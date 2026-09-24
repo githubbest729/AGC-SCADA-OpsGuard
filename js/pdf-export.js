@@ -103,7 +103,8 @@ const PdfExport = (() => {
             useCORS: true,
             letterRendering: true
           },
-          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" }
+          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ['css', 'legacy'] }
         })
         .from(html) // Pass the string here
         .save();
