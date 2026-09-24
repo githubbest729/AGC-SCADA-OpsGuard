@@ -1,7 +1,7 @@
 /* ==========================================================================
    AGC SCADA OpsGuard — Compliance PDF export
    Renders an off-screen letterhead sheet and exports via html2pdf.js
-   Includes explicit image preloading/decoding for mobile Safari (iOS/iPhone).
+   Uses the Pure String Method with embedded image promises to prevent blank outputs.
    ========================================================================== */
 
 const PdfExport = (() => {
@@ -88,25 +88,10 @@ const PdfExport = (() => {
   }
 
   async function exportHtml(html, filename) {
-    // Create a temporary sandbox container in the DOM so mobile Safari can decode base64 images properly
-    const container = document.createElement("div");
-    container.style.cssText = "position:fixed; top:0; left:0; z-index:-9999; width:760px; background:#ffffff;";
-    container.innerHTML = html;
-    document.body.appendChild(container);
-
     try {
-      // Explicitly wait for all images inside the container to fully decode before rendering to canvas
-      const imgs = container.querySelectorAll("img");
-      await Promise.all([...imgs].map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      }));
-
       const html2pdf = await loadLib();
       
+      // Pass the raw HTML string directly into .from() — avoiding DOM attach/detach security issues
       await html2pdf()
         .set({
           margin: 24,
@@ -121,7 +106,7 @@ const PdfExport = (() => {
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
         })
-        .from(container)
+        .from(html)
         .save();
         
     } catch (err) {
@@ -131,11 +116,6 @@ const PdfExport = (() => {
       win.document.close();
       win.focus();
       setTimeout(() => win.print(), 300);
-    } finally {
-      // Clean up the temporary DOM container
-      if (container.parentNode) {
-        document.body.removeChild(container);
-      }
     }
   }
 
