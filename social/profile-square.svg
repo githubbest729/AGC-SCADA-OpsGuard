@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10151C"/><stop offset="1" stop-color="#070A0D"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <g transform="translate(180,240)">
+    <polygon points="220,0 400,110 400,330 220,440 40,330 40,110" fill="none" stroke="#FF7A18" stroke-width="16" stroke-linejoin="round"/>
+    <polyline points="40,220 140,220 140,145 305,145 305,295 400,295" fill="none" stroke="#2DD4BF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="305" cy="145" r="13" fill="#2DD4BF"/>
+    <circle cx="140" cy="220" r="13" fill="#2DD4BF"/>
+  </g>
+  <text x="400" y="700" text-anchor="middle" font-family="Oswald, Arial Narrow, sans-serif" font-weight="600" font-size="46" fill="#E6EDF3">OpsGuard</text>
+</svg>

@@ -1,4 +1,73 @@
-https://capsule-render.vercel.app/api?type=waving&color=0ea5e9&height=150&section=header&text=AGC%20SCADA%20OpsGuard&fontSize=40&fontAlignY=35&animation=twinkling&fontColor=ffffff" alt="AGC SCADA OpsGuard Animated Banner" width="100%"/>
-    **Routine Maintenance, Stability, and Security Auditing for Isolated Industrial Networks**
---- > [!CAUTION] > **Air-Gapped Environment Ready** > This application is strictly offline-first. Designed for Al Gurg Automation & Controls field deployments, all maintenance logs, backup verification hashes, and vulnerability checklists are stored locally in the browser via IndexedDB. No server connection is required after the initial PWA installation. ## 📊 Maintenance & Compliance Workflow ```mermaid %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0f172a', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#38bdf8', 'lineColor': '#0ea5e9', 'secondaryColor': '#1e293b', 'tertiaryColor': '#0b1220'}}}%% stateDiagram-v2 direction LR [*] --> Shift_Handover state "Routine Maintenance" as RM { Shift_Handover --> Visual_Inspection Visual_Inspection --> Server_Health_Check Server_Health_Check --> Network_Redundancy_Test } state "Security & Backups" as SB { Network_Redundancy_Test --> Firewall_Audit Firewall_Audit --> PLC_Firmware_Registry PLC_Firmware_Registry --> Backup_Hash_Verification } SB --> Official_SignOff Official_SignOff --> PDF_Generation PDF_Generation --> [*] ``` ## ⚙️ Core Modules ### 1. Preventive Maintenance (PM) Scheduler Interactive, persistent checklists tailored for SCADA operations. * **Daily:** CPU/RAM utilization, Historian database replication state, HMI runtime stability. * **Weekly:** Redundant fiber optic ring (DLR/STP) status, switch error counters. * **Monthly:** UPS battery health, physical rack temperature logs. ### 2. Firmware & Asset Registry Maintain an exact matrix of your installed footprint to prevent catastrophic compatibility mismatches during upgrade cycles. * Track **Siemens TIA Portal**, **Allen-Bradley Logix**, and **Wonderware/AVEVA** versions. * Monitor software support expiration and SSL certificate validity. ### 3. Cybersecurity Hardening Checklists Built-in audit flows for industrial networks. * Default password audits and unused physical port disabling verification. * Windows Domain privilege reviews for HMI operator clients. * Disaster recovery logs with cryptographic hash verification for PLC project archives. ### 4. Automated Compliance Reporting Generate formal, branded maintenance sign-off sheets instantly. ```mermaid %%{init: {'theme': 'dark'}}%% pie title "Typical SCADA Audit Time Allocation" "Preventive Maintenance Checklists" : 45 "Backup Verification & Logging" : 25 "Cybersecurity Hardening" : 20 "PDF Sign-off & Compliance" : 10 ``` --- ## 📂 File Architecture > [!NOTE] > OpsGuard utilizes a pure Vanilla JS stack for maximum longevity and zero build-step overhead, identical to the DocuVault architecture. | File / Component | Purpose | | :--- | :--- | | `index.html` | App shell, PWA metadata, and responsive grid layout | | `app.js` | Logic for checklist state, firmware registry, and PDF export | | `database.js` | IndexedDB wrapper (`OpsGuardDB`) handling asynchronous local storage | | `service-worker.js` | Offline caching for air-gapped usability | | `style.css` | Industrial dark theme matching control room environments | | `seed-data.js` | Pre-loaded PM templates and security audit checklists | | `manifest.json` | PWA installation configuration | --- ## 🛠️ Deployment & Installation 1. **Host the Repository:** Serve the repository from any standard web server, GitHub Pages, or locally. 2. **First Load (Requires Network):** Navigate to the URL on a tablet or engineering workstation. The Service Worker will automatically cache the HTML, CSS, JS, and CDN libraries (`marked.js`, `html2pdf.js`). 3. **Install as PWA:** Click the "Install App" prompt in your browser address bar. 4. **Offline Use:** The application can now be launched directly from the desktop/home screen and will function flawlessly in deep, air-gapped substation environments.
-```json { "database": "agc-opsguard-db", "version": 1, "stores": { "maintenance_logs": { "keyPath": "id", "indexes": ["date", "category", "status"] }, "asset_registry": { "keyPath": "asset_tag", "indexes": ["vendor", "firmware_version", "location"] } } } `
+# AGC SCADA OpsGuard
+
+Offline-first PWA for instrumentation & control engineers — preventive
+maintenance scheduling, PLC/HMI/SCADA firmware version tracking, license &
+certificate expiry tracking, cybersecurity hardening/access audits, and
+backup verification logging, with one-click branded PDF compliance
+reports. Built for Al Gurg Automation & Controls.
+
+## Tech stack
+- Vanilla JavaScript, HTML5, CSS3 — no build step, no framework
+- IndexedDB for local, offline data (equipment registry, maintenance logs,
+  audit records)
+- Service Worker with app-shell precache + runtime caching so checklists
+  run with zero connectivity in the field
+- `html2pdf.js` (loaded from CDN, cached after first use) for branded
+  compliance PDF exports — falls back to the browser print dialog if
+  fully offline on first use
+
+## Run it locally
+Any static file server works — a service worker requires `http://` or
+`https://` (not `file://`):
+
+```bash
+cd agc-scada-opsguard
+python3 -m http.server 8080
+# open http://localhost:8080
+```
+
+## Deploy it
+Upload the folder as-is to any static host (Netlify, GitHub Pages, an
+internal IIS/nginx box, etc). No server-side code or database is
+required — everything after first load lives in the browser's IndexedDB
+on the engineer's device.
+
+## Install on a device
+Open the site in Chrome/Edge (desktop or Android) or Safari (iOS/iPadOS)
+and use "Install app" / "Add to Home Screen". Once installed, OpsGuard
+launches full-screen and works with zero signal at remote substations or
+deep inside plant buildings.
+
+## Folder structure
+```
+agc-scada-opsguard/
+├── index.html          # App shell, hash-router mounts views into #view
+├── offline.html         # Fallback page served by the service worker
+├── manifest.json         # PWA manifest (icons, shortcuts, theme)
+├── sw.js                  # Service worker — app-shell + runtime caching
+├── css/style.css           # Dark industrial / control-panel design system
+├── js/
+│   ├── db.js                # IndexedDB wrapper (OpsDB)
+│   ├── seed-data.js          # First-run demo dataset
+│   ├── pdf-export.js          # Letterhead PDF report builder
+│   └── app.js                   # Router + all views + CRUD logic
+├── icons/                  # App icons (all manifest sizes) + favicon
+└── social/                  # Social sharing / announcement image assets
+```
+
+## Data model (IndexedDB stores)
+`equipment`, `versions`, `licenses`, `pmTemplates`, `pmRuns`,
+`securityChecks`, `securityRuns`, `backups`, `settings`. See
+`js/db.js` for the schema and `js/seed-data.js` for the seeded demo
+records (including the Weekly SCADA & Server Health Check template).
+
+## Notes
+- First run seeds a small demo dataset (sample PLC/HMI/server registry,
+  version matrix, licenses, a security checklist baseline, and a couple
+  of backup log entries) so the app is immediately useful — reset it any
+  time from **Settings → Reset demo data**.
+- **Settings → Export all data (JSON)** gives you a full local backup of
+  everything in IndexedDB.
+- Replace `icons/icon-master.svg` and `social/*.svg` with your own brand
+  artwork and re-render the PNGs if you want a different visual identity
+  than the demo dark/amber SCADA theme used here.

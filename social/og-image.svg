@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10151C"/>
+      <stop offset="1" stop-color="#070A0D"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#1B222B" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="0" y="0" width="1200" height="630" fill="none" stroke="#1B222B" stroke-width="2"/>
+
+  <!-- mark -->
+  <g transform="translate(90,175)">
+    <polygon points="130,0 240,64 240,192 130,256 20,192 20,64" fill="none" stroke="#FF7A18" stroke-width="10" stroke-linejoin="round"/>
+    <polyline points="20,128 82,128 82,84 178,84 178,172 240,172" fill="none" stroke="#2DD4BF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="178" cy="84" r="8" fill="#2DD4BF"/>
+    <circle cx="82" cy="128" r="8" fill="#2DD4BF"/>
+  </g>
+
+  <text x="400" y="255" font-family="Oswald, Arial Narrow, sans-serif" font-weight="600" font-size="30" letter-spacing="3" fill="#FF7A18">AL GURG AUTOMATION &amp; CONTROLS</text>
+  <text x="400" y="335" font-family="Oswald, Arial Narrow, sans-serif" font-weight="600" font-size="72" fill="#E6EDF3">AGC SCADA OpsGuard</text>
+  <text x="400" y="385" font-family="'IBM Plex Sans', Arial, sans-serif" font-weight="400" font-size="26" fill="#8B98A5">Offline-first maintenance, firmware &amp; cybersecurity</text>
+  <text x="400" y="420" font-family="'IBM Plex Sans', Arial, sans-serif" font-weight="400" font-size="26" fill="#8B98A5">control for plant-floor I&amp;C engineers.</text>
+
+  <g font-family="'IBM Plex Mono', monospace" font-size="18" fill="#3A4451">
+    <text x="400" y="470">PM SCHEDULER</text>
+    <text x="620" y="470">FIRMWARE REGISTRY</text>
+    <text x="890" y="470">SECURITY AUDIT LOG</text>
+  </g>
+  <rect x="400" y="483" width="700" height="3" fill="#232B35"/>
+  <rect x="400" y="483" width="120" height="3" fill="#FF7A18"/>
+
+  <text x="400" y="560" font-family="'IBM Plex Mono', monospace" font-size="18" fill="#4B5560">PROGRESSIVE WEB APP · WORKS OFFLINE ON THE PLANT FLOOR</text>
+</svg>

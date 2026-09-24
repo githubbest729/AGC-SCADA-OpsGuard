@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10151C"/>
+      <stop offset="1" stop-color="#080B0F"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- hex bolt outline -->
+  <polygon points="256,96 366,160 366,288 256,352 146,288 146,160" fill="none" stroke="#FF7A18" stroke-width="14" stroke-linejoin="round"/>
+  <!-- ladder-logic / signal rung through the hex -->
+  <polyline points="146,224 208,224 208,180 304,180 304,268 366,268" fill="none" stroke="#2DD4BF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- status LED node -->
+  <circle cx="304" cy="180" r="11" fill="#2DD4BF"/>
+  <circle cx="208" cy="224" r="11" fill="#2DD4BF"/>
+  <!-- base plate ticks (control-panel motif) -->
+  <rect x="176" y="400" width="160" height="8" fill="#FF7A18"/>
+  <rect x="196" y="416" width="120" height="6" fill="#3A4451"/>
+</svg>
