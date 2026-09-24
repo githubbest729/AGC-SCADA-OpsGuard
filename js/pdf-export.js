@@ -89,20 +89,21 @@ const PdfExport = (() => {
       .join("")}</div>`;
   }
 
-  async function exportHtml(html, filename) {
+async function exportHtml(html, filename) {
     try {
       const html2pdf = await loadLib();
       
       await html2pdf()
         .set({
-          margin: [20, 20, 20, 20],
+          // FIX: Use an explicit margin array [top, right, bottom, left] to eliminate the top gap
+          margin: [15, 20, 15, 20], 
           filename: filename,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {  
             scale: 2,  
             useCORS: true,
-            letterRendering: true
-            // Removed fixed windowWidth so html2canvas safely evaluates the container natively
+            letterRendering: true,
+            windowWidth: 555 // Perfect fit for A4 printable width
           },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
