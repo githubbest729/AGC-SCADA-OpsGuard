@@ -1,7 +1,7 @@
 /* ==========================================================================
    AGC SCADA OpsGuard — Compliance PDF export
    Renders an off-screen letterhead sheet and exports via html2pdf.js
-   Uses the Raw String Method to prevent blank/zero-height canvas rendering.
+   Includes explicit image preloading/decoding for mobile Safari (iOS/iPhone).
    ========================================================================== */
 
 const PdfExport = (() => {
@@ -27,7 +27,6 @@ const PdfExport = (() => {
   function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
-    // FIX: Removed height: 100% and width: 100% stretching. Set a fixed 760px print canvas.
     return `
     <div style="background-color: #ffffff; width: 760px; box-sizing: border-box; margin: 0 auto; padding: 0;">
       <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%; padding:0;">
@@ -89,7 +88,23 @@ const PdfExport = (() => {
   }
 
   async function exportHtml(html, filename) {
+    // Create a temporary sandbox container in the DOM so mobile Safari can decode base64 images properly
+    const container = document.createElement("div");
+    container.style.cssText = "position:fixed; top:0; left:0; z-index:-9999; width:760px; background:#ffffff;";
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
     try {
+      // Explicitly wait for all images inside the container to fully decode before rendering to canvas
+      const imgs = container.querySelectorAll("img");
+      await Promise.all([...imgs].map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      }));
+
       const html2pdf = await loadLib();
       
       await html2pdf()
@@ -100,12 +115,13 @@ const PdfExport = (() => {
           html2canvas: { 
             scale: 2, 
             useCORS: true,
-            letterRendering: true
+            letterRendering: true,
+            windowWidth: 760
           },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
         })
-        .from(html)
+        .from(container)
         .save();
         
     } catch (err) {
@@ -115,6 +131,11 @@ const PdfExport = (() => {
       win.document.close();
       win.focus();
       setTimeout(() => win.print(), 300);
+    } finally {
+      // Clean up the temporary DOM container
+      if (container.parentNode) {
+        document.body.removeChild(container);
+      }
     }
   }
 
