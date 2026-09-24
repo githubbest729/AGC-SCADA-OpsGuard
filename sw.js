@@ -43,24 +43,22 @@ self.addEventListener("activate", (event) => {
 // - Navigation requests: network-first, falling back to cached shell / offline.html
 // - Same-origin static assets: cache-first
 // - Cross-origin (e.g. CDN html2pdf, Google Fonts): stale-while-revalidate, best-effort
-self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  if (request.method !== "GET") return;
-
-  const url = new URL(request.url);
-
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put("./index.html", copy));
-          return response;
-        })
-        .catch(async () => (await caches.match("./index.html")) || caches.match("./offline.html"))
-    );
+self.addEventListener('fetch', (event) => {
+  // IGNORE non-http requests (like browser extensions, chrome-extension://, etc.)
+  if (!event.request.url.startsWith('http')) {
     return;
   }
+
+  // Your existing cache/fetch handling logic below...
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request).then((networkResponse) => {
+        // Optional caching logic
+        return networkResponse;
+      });
+    })
+  );
+});
 
   if (url.origin === self.location.origin) {
     event.respondWith(
