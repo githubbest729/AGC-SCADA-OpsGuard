@@ -12,7 +12,7 @@
 ![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-4ade80?style=for-the-badge)
 
 **Offline-first PWA for instrumentation & control engineers**  
-*Built for Al Gurg Automation & Controls.*
+*Built for Automation & Controls.*
 
 </div>
 
