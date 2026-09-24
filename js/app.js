@@ -294,7 +294,7 @@ async function renderPmRun(runId) {
       </div>
     </div>
 
-   <!-- Photo Evidence Panel with Direct File Input Overlay -->
+    <!-- Photo Evidence Panel with Direct File Input Overlay -->
     <div class="panel mb-16">
       <div class="panel-head"><h3>Photo Evidence</h3></div>
       <div class="panel-body">
@@ -338,59 +338,59 @@ async function renderPmRun(runId) {
     })
   );
 
-  // NEW: Camera & Image compression logic
+  // Camera & Image compression logic with tracking promise
   const cameraInput = document.getElementById("cameraInput");
-  const btnCapture = document.getElementById("btnCapturePhoto");
   const btnClear = document.getElementById("btnClearPhoto");
   const previewContainer = document.getElementById("photoPreviewContainer");
   const previewImg = document.getElementById("photoPreview");
   const captureText = document.getElementById("btnCaptureText");
 
-  btnCapture.addEventListener("click", () => cameraInput.click());
+  let pendingPhotoPromise = null;
 
   cameraInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        // Shrink the image to max 800px width so IndexedDB doesn't get bloated
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800;
-        let width = img.width;
-        let height = img.height;
+    pendingPhotoPromise = new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
 
-        if (width > MAX_WIDTH) {
-          height = Math.round((height * MAX_WIDTH) / width);
-          width = MAX_WIDTH;
-        }
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert back to base64 JPEG at 80% quality
-        const base64Str = canvas.toDataURL("image/jpeg", 0.8);
-        run.photoBase64 = base64Str;
+          const base64Str = canvas.toDataURL("image/jpeg", 0.8);
+          run.photoBase64 = base64Str;
 
-        // Update the UI
-        previewImg.src = base64Str;
-        previewContainer.style.display = "block";
-        btnClear.style.display = "inline-block";
-        captureText.textContent = "Retake Photo";
-        
-        OpsDB.put("pmRuns", run); // Auto-save when picture is taken
+          previewImg.src = base64Str;
+          previewContainer.style.display = "block";
+          btnClear.style.display = "inline-block";
+          captureText.textContent = "Retake Photo";
+          
+          OpsDB.put("pmRuns", run);
+          resolve(base64Str);
+        };
+        img.src = event.target.result;
       };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   });
 
   btnClear.addEventListener("click", () => {
     run.photoBase64 = null;
+    pendingPhotoPromise = null;
     previewImg.src = "";
     previewContainer.style.display = "none";
     btnClear.style.display = "none";
@@ -400,6 +400,7 @@ async function renderPmRun(runId) {
 
   // Action Buttons
   document.getElementById("btnSaveRun").addEventListener("click", async () => {
+    if (pendingPhotoPromise) await pendingPhotoPromise;
     run.remarks = document.getElementById("runRemarks").value;
     await OpsDB.put("pmRuns", run);
     toast("Progress saved locally.");
@@ -412,6 +413,12 @@ async function renderPmRun(runId) {
   });
 
   document.getElementById("btnCompleteRun").addEventListener("click", async () => {
+    // Safely wait if a photo is still finishing compression
+    if (pendingPhotoPromise) {
+      toast("Finalizing photo attachment...");
+      await pendingPhotoPromise;
+    }
+
     run.remarks = document.getElementById("runRemarks").value;
     run.completedAt = new Date().toISOString();
     run.status = "completed";
