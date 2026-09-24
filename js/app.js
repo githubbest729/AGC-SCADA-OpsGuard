@@ -420,16 +420,27 @@ async function renderPmRun(runId) {
   });
 }
 
-// NEW: Updated to embed the photo in the PDF
+// NEW: Updated to embed the photo proportionally and prevent page-slicing
 async function exportPmRunPdf(run, template) {
   const stepsHtml = PdfExport.checklistToHtml(template.steps.map((s, i) => ({ id: i, text: s })), run.checks);
-  const photoHtml = run.photoBase64 ? `<div style="margin-top:16px;"><strong>Photo Evidence:</strong><br/><img src="${run.photoBase64}" style="max-width: 320px; max-height: 400px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px;" /></div>` : '';
+  
+  // FIX: Added 'page-break-inside: avoid' and 'height: auto'
+  const photoHtml = run.photoBase64 
+    ? `<div style="margin-top:16px; page-break-inside: avoid; break-inside: avoid;">
+         <strong>Photo Evidence:</strong><br/>
+         <img src="${run.photoBase64}" style="width: 350px; height: auto; max-width: 100%; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; display: block;" />
+       </div>` 
+    : '';
   
   const body = `
     ${stepsHtml}
-    <div style="margin-top:16px;"><strong>Remarks / anomalies:</strong><div style="margin-top:4px; white-space:pre-wrap;">${esc(run.remarks) || "None recorded."}</div></div>
+    <div style="margin-top:16px; page-break-inside: avoid; break-inside: avoid;">
+      <strong>Remarks / anomalies:</strong>
+      <div style="margin-top:4px; white-space:pre-wrap;">${esc(run.remarks) || "None recorded."}</div>
+    </div>
     ${photoHtml}
   `;
+  
   const html = PdfExport.buildLetterhead({
     plantName: APP_SETTINGS.plantName,
     reportTitle: template.title,
@@ -438,6 +449,7 @@ async function exportPmRunPdf(run, template) {
     engineerName: APP_SETTINGS.engineerName,
     engineerRole: APP_SETTINGS.engineerRole
   });
+  
   await PdfExport.exportHtml(html, `OpsGuard_${template.title.replace(/\s+/g, "_")}_${run.completedAt.slice(0, 10)}.pdf`);
 }
 
