@@ -211,7 +211,7 @@ async function renderPmList() {
         <div class="panel-head"><h3>${esc(FREQ_LABEL[freq])}</h3></div>
         <div class="panel-body">
           <table>
-            <thead><tr><th>Checklist</th><th>Steps</th><th>Status</th><th>Last completed</th><th></th></tr></thead>
+            <thead><tr><th>Checklist</th><th>Steps</th><th>Status</th><th>Last completed</th><th class="text-right">Actions</th></tr></thead>
             <tbody>
               ${items.map((t) => {
                 const inProgress = runs.find((r) => r.templateId === t.id && r.status === "in_progress");
@@ -360,7 +360,7 @@ async function renderPmHistory() {
     <div class="page-head"><div><h1>Checklist History</h1><div class="sub">Completed PM sign-offs, stored locally</div></div></div>
     <div class="panel"><div class="panel-body scroll-x">
       <table>
-        <thead><tr><th>Checklist</th><th>Frequency</th><th>Completed</th><th>Engineer</th><th>Remarks</th><th></th></tr></thead>
+        <thead><tr><th>Checklist</th><th>Frequency</th><th>Completed</th><th>Engineer</th><th>Remarks</th><th class="text-right">Actions</th></tr></thead>
         <tbody>
           ${runs.length === 0 ? `<tr class="empty-row"><td colspan="6">No completed checklists yet. Run one from the PM Scheduler.</td></tr>` :
             runs.map((r) => `
@@ -397,7 +397,7 @@ async function renderEquipment() {
     </div>
     <div class="panel"><div class="panel-body scroll-x">
       <table>
-        <thead><tr><th>Tag</th><th>Name</th><th>Type</th><th>Vendor / Model</th><th>Location</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Tag</th><th>Name</th><th>Type</th><th>Vendor / Model</th><th>Location</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
         <tbody>
           ${equipment.length === 0 ? `<tr class="empty-row"><td colspan="7">No equipment registered yet.</td></tr>` :
             equipment.map((e) => `
@@ -473,7 +473,7 @@ async function renderVersions() {
     </div>
     <div class="panel"><div class="panel-body scroll-x">
       <table>
-        <thead><tr><th>Equipment</th><th>Software</th><th>Installed</th><th>Latest</th><th>Verified</th><th>Note</th><th></th></tr></thead>
+        <thead><tr><th>Equipment</th><th>Software</th><th>Installed</th><th>Latest</th><th>Verified</th><th>Note</th><th class="text-right">Actions</th></tr></thead>
         <tbody>
           ${versions.length === 0 ? `<tr class="empty-row"><td colspan="7">No version records yet.</td></tr>` :
             versions.map((v) => `
@@ -540,7 +540,7 @@ async function renderLicenses() {
     </div>
     <div class="panel"><div class="panel-body scroll-x">
       <table>
-        <thead><tr><th>Item</th><th>Type</th><th>Expiry</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Item</th><th>Type</th><th>Expiry</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
         <tbody>
           ${licenses.length === 0 ? `<tr class="empty-row"><td colspan="5">No licenses or certificates tracked yet.</td></tr>` :
             licenses.map((l) => {
@@ -620,7 +620,7 @@ async function renderSecurity() {
       <div class="panel-head"><h3>Audit run history</h3></div>
       <div class="panel-body scroll-x">
         <table>
-          <thead><tr><th>Completed</th><th>Engineer</th><th>Result</th><th></th></tr></thead>
+          <thead><tr><th>Completed</th><th>Engineer</th><th>Result</th><th class="text-right">Actions</th></tr></thead>
           <tbody>
             ${completed.length === 0 ? `<tr class="empty-row"><td colspan="4">No completed audits yet.</td></tr>` :
               completed.map((r) => {
@@ -754,7 +754,7 @@ async function renderBackups() {
     </div>
     <div class="panel"><div class="panel-body scroll-x">
       <table>
-        <thead><tr><th>Date</th><th>Item</th><th>Verification method</th><th>Value</th><th>Result</th><th></th></tr></thead>
+        <thead><tr><th>Date</th><th>Item</th><th>Verification method</th><th>Value</th><th>Result</th><th class="text-right">Actions</th></tr></thead>
         <tbody>
           ${backups.length === 0 ? `<tr class="empty-row"><td colspan="6">No backup verification records yet.</td></tr>` :
             backups.map((b) => `

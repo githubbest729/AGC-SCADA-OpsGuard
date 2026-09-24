@@ -3,8 +3,8 @@
    Palette:   #0D1117 base / #131A22 panel / #1B232D raised / #2A323C border
               #FF7A18 signal-orange (primary action / alert)
               #2DD4BF signal-teal (ok / active)
-              #E5484D fault-red (fault / overdue)
-              #E6EDF3 text-hi / #8B98A5 text-mid / #4B5560 text-low
+              #EF4444 fault-red (fault / overdue) — WCAG AA 4.5:1+ on all surfaces
+              #E6EDF3 text-hi / #8B98A5 text-mid / #7F8FA0 text-low — all ≥4.5:1 on base/panel/raised
    Type:      Oswald (condensed, control-panel signage) for headings
               IBM Plex Sans for body copy
               IBM Plex Mono for version numbers, hashes, timestamps, data
@@ -21,10 +21,10 @@
   --orange: #ff7a18;
   --orange-dim: #a85512;
   --teal: #2dd4bf;
-  --red: #e5484d;
+  --red: #ef4444;
   --text-hi: #e6edf3;
   --text-mid: #8b98a5;
-  --text-low: #4b5560;
+  --text-low: #7f8fa0;
   --font-display: "Oswald", "Arial Narrow", sans-serif;
   --font-body: "IBM Plex Sans", -apple-system, Segoe UI, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
@@ -256,7 +256,7 @@ main#view {
 }
 .tag.ok { color: var(--teal); border-color: rgba(45,212,191,0.4); }
 .tag.warn { color: var(--orange); border-color: rgba(255,122,24,0.4); }
-.tag.fault { color: var(--red); border-color: rgba(229,72,77,0.4); }
+.tag.fault { color: var(--red); border-color: rgba(239,68,68,0.4); }
 
 /* ---------------------------------------------------------------------- */
 /* Buttons / forms                                                        */
