@@ -24,37 +24,38 @@ const PdfExport = (() => {
     return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
+function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
+    // FIX: Changed width from 760px to 535px to prevent horizontal edge clipping on A4 paper
     return `
-    <div style="background-color: #ffffff; width: 760px; box-sizing: border-box; margin: 0 auto; padding: 0;">
+    <div style="background-color: #ffffff; width: 535px; box-sizing: border-box; margin: 0 auto; padding: 0;">
       <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%; padding:0;">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #FF7A18; padding-bottom:14px; margin-bottom:18px;">
           <div>
-            <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:22px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
-            <div style="font-size:11px; letter-spacing:0.08em; color:#666; margin-top:2px;">INSTRUMENTATION &amp; CONTROL — SCADA COMPLIANCE REPORT</div>
+            <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:20px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
+            <div style="font-size:10.5px; letter-spacing:0.08em; color:#666; margin-top:2px;">INSTRUMENTATION &amp; CONTROL — SCADA COMPLIANCE REPORT</div>
           </div>
-          <div style="text-align:right; font-size:11px; color:#666;">
+          <div style="text-align:right; font-size:10.5px; color:#666;">
             <div>Generated: ${esc(today)}</div>
             <div>System: AGC SCADA OpsGuard</div>
           </div>
         </div>
 
-        <h1 style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:19px; margin:0 0 2px;">${esc(reportTitle)}</h1>
-        <div style="font-size:12px; color:#555; margin-bottom:16px;">${esc(reportMeta)}</div>
+        <h1 style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:18px; margin:0 0 2px;">${esc(reportTitle)}</h1>
+        <div style="font-size:11.5px; color:#555; margin-bottom:14px;">${esc(reportMeta)}</div>
 
-        <div style="font-size:13px; line-height:1.55;">${bodyHtml}</div>
+        <div style="font-size:12.5px; line-height:1.5;">${bodyHtml}</div>
 
-        <div style="margin-top:34px; display:flex; gap:40px; page-break-inside: avoid; break-inside: avoid;">
-          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:11px; color:#555;">
+        <div style="margin-top:30px; display:flex; gap:30px; page-break-inside: avoid; break-inside: avoid;">
+          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:10.5px; color:#555;">
             Engineer Sign-off — ${esc(engineerName || "")}${engineerRole ? ", " + esc(engineerRole) : ""}
           </div>
-          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:11px; color:#555;">
+          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:10.5px; color:#555;">
             Plant Supervisor Sign-off
           </div>
         </div>
-        <div style="margin-top:24px; font-size:10px; color:#999; border-top:1px solid #eee; padding-top:8px; page-break-inside: avoid; break-inside: avoid;">
+        <div style="margin-top:20px; font-size:9.5px; color:#999; border-top:1px solid #eee; padding-top:8px; page-break-inside: avoid; break-inside: avoid;">
           Al Gurg Automation &amp; Controls · ${esc(plantName || "")} · Generated offline-first via AGC SCADA OpsGuard PWA
         </div>
       </div>
