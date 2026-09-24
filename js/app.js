@@ -105,6 +105,11 @@ async function refreshNavBadges() {
   const licBadge = document.getElementById("licBadge");
   if (expiring > 0) { licBadge.style.display = "inline-block"; licBadge.textContent = expiring; }
   else licBadge.style.display = "none";
+
+  // --- NEW: Update the Native OS PWA Badge dynamically ---
+  if (typeof AppBadge !== 'undefined') {
+    AppBadge.update();
+  }
 }
 
 function isDue(template, allRuns) {
@@ -592,7 +597,7 @@ function openLicenseModal(existing) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Cybersecurity Audit                                                 */
+/* Cybersecurity Audit                                                */
 /* ------------------------------------------------------------------ */
 async function renderSecurity() {
   const [checks, runs] = await Promise.all([OpsDB.getAll("securityChecks"), OpsDB.getAll("securityRuns")]);
@@ -610,8 +615,7 @@ async function renderSecurity() {
       <div class="panel-head"><h3>Checklist baseline</h3></div>
       <div class="panel-body">
         ${categories.map((cat) => `
-          <h4 style="font-size:13px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 6px;">${esc(cat)}</h4>
-          ${checks.filter(c=>c.category===cat).map((c) => `<div class="checklist-item"><span class="led led--grey" style="margin-top:5px;"></span><span class="txt">${esc(c.item)}</span></div>`).join("")}
+          <h4 style="font-size:13px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 6px;">${esc(cat)}</h4>${checks.filter(c=>c.category===cat).map((c) => `<div class="checklist-item"><span class="led led--grey" style="margin-top:5px;"></span><span class="txt">${esc(c.item)}</span></div>`).join("")}
         `).join("")}
       </div>
     </div>
@@ -676,8 +680,7 @@ async function renderSecurityRun(runId) {
     <div class="panel mb-16"><div class="panel-body">
       <div class="flex gap-12 mb-16"><div class="progress-track" style="flex:1;"><div class="progress-fill" style="width:${pct}%"></div></div><div class="mono" style="font-size:12px;">${done}/${total}</div></div>
       ${categories.map((cat) => `
-        <h4 style="font-size:13px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 2px;">${esc(cat)}</h4>
-        ${checks.filter(c=>c.category===cat).map((c) => `
+        <h4 style="font-size:13px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 2px;">${esc(cat)}</h4>${checks.filter(c=>c.category===cat).map((c) => `
           <label class="checklist-item ${run.checks[c.id] ? "done" : ""}">
             <input type="checkbox" ${run.checks[c.id] ? "checked" : ""} data-sec-idx="${c.id}" />
             <span class="txt">${esc(c.item)}</span>
@@ -910,7 +913,7 @@ async function renderSettings() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Bootstrapping                                                       */
+/* Bootstrapping                                                      */
 /* ------------------------------------------------------------------ */
 function updateConnStatus() {
   const led = document.getElementById("connLed");
