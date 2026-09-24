@@ -93,16 +93,16 @@ function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, enginee
       const html2pdf = await loadLib();
       
       // Pass the raw HTML string directly into .from() — avoiding DOM attach/detach security issues
-      await html2pdf()
+     await html2pdf()
         .set({
           margin: 24,
           filename: filename,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { 
-            scale: 2, 
+          html2canvas: {  
+            scale: 2,  
             useCORS: true,
             letterRendering: true,
-            windowWidth: 760
+            windowWidth: 535  // <--- CHANGE THIS FROM 760 TO 535
           },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
