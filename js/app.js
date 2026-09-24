@@ -424,11 +424,11 @@ async function renderPmRun(runId) {
 async function exportPmRunPdf(run, template) {
   const stepsHtml = PdfExport.checklistToHtml(template.steps.map((s, i) => ({ id: i, text: s })), run.checks);
   
-  // FIX: Added 'page-break-inside: avoid' and 'height: auto'
+  // FIXED: Added strict height boundaries and clean page-break containment
   const photoHtml = run.photoBase64 
-    ? `<div style="margin-top:16px; page-break-inside: avoid; break-inside: avoid;">
+    ? `<div style="margin-top:20px; page-break-inside: avoid; break-inside: avoid;">
          <strong>Photo Evidence:</strong><br/>
-         <img src="${run.photoBase64}" style="width: 350px; height: auto; max-width: 100%; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; display: block;" />
+         <img src="${run.photoBase64}" style="max-width: 280px; max-height: 260px; width: auto; height: auto; display: block; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px;" />
        </div>` 
     : '';
   
