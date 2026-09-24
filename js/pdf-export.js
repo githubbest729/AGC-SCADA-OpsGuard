@@ -86,7 +86,11 @@ const PdfExport = (() => {
 
   async function exportHtml(html, filename) {
     const container = document.createElement("div");
-    container.style.cssText = "position:fixed; left:-9999px; top:0; background:#fff;";
+    // Positioned at real (0,0) coordinates and hidden behind everything via
+    // z-index, rather than pushed off-screen with a negative offset — a
+    // negative-left container makes html2canvas capture a blank/white
+    // canvas in some Chromium builds.
+    container.style.cssText = "position:fixed; top:0; left:0; z-index:-9999; width:800px; background:#ffffff;";
     container.innerHTML = html;
     document.body.appendChild(container);
 
@@ -97,7 +101,7 @@ const PdfExport = (() => {
           margin: 24,
           filename,
           image: { type: "jpeg", quality: 0.97 },
-          html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+          html2canvas: { scale: 2, backgroundColor: "#ffffff", scrollX: 0, scrollY: 0, windowWidth: 800 },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" }
         })
         .from(container)
