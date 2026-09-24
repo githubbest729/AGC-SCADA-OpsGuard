@@ -12,7 +12,7 @@
 ![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-4ade80?style=for-the-badge)
 
 **Offline-first PWA for instrumentation & control engineers**  
-*Built for Automation & Controls.*
+*Built for Al Gurg Automation & Controls.*
 
 </div>
 
@@ -45,12 +45,8 @@ erDiagram
     EQUIPMENT ||--o{ BACKUPS : verified_by
     PM_TEMPLATES ||--o{ PM_RUNS : instantiates
     SECURITY_CHECKS ||--o{ SECURITY_RUNS : guides
-```
 
----
-
-## 💻 Tech Stack & Folder Structure
-
+💻 Tech Stack & Folder Structure
 Frontend: Vanilla JavaScript, HTML5, CSS3 (No build step, no framework).
 
 Storage: IndexedDB for secure, local offline data.
@@ -58,8 +54,7 @@ Storage: IndexedDB for secure, local offline data.
 PWA Layer: Service Worker with app-shell precache + runtime CDN caching.
 
 Reporting: html2pdf.js loaded via CDN (falls back to native browser print if fully offline on first use).
-    PM_TEMPLATES ||--o{ PM_RUNS : instantiates
-    SECURITY_CHECKS ||--o{ SECURITY_RUNS : guides
+
 
 agc-scada-opsguard/
 ├── index.html          # App shell, hash-router mounts views into #view
@@ -79,10 +74,9 @@ agc-scada-opsguard/
 Run it Locally
 Any static file server works. Note: A service worker requires http:// or https:// (it will not work directly from a file:// URL).
 
-Bash
 cd agc-scada-opsguard
 python3 -m http.server 8080
-# Open http://localhost:8080 in your 
+# Open http://localhost:8080 in your browser
 
 Production Deployment
 Upload the folder as-is to any static host (GitHub Pages, Netlify, or an internal IIS/nginx server). No server-side code or cloud database is required.
