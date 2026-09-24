@@ -1,7 +1,6 @@
 /* ==========================================================================
    AGC SCADA OpsGuard — Compliance PDF export
    Renders an off-screen letterhead sheet and exports via html2pdf.js
-   Uses the Pure String Method with embedded image promises to prevent blank outputs.
    ========================================================================== */
 
 const PdfExport = (() => {
@@ -24,13 +23,14 @@ const PdfExport = (() => {
     return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
+  function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
-    // FIX: Changed width from 760px to 535px to prevent horizontal edge clipping on A4 paper
+    // FIX: Use max-width with 100% and safe padding to prevent edge clipping on A4
     return `
-    <div style="background-color: #ffffff; width: 535px; box-sizing: border-box; margin: 0 auto; padding: 0;">
-      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%; padding:0;">
+    <div style="background-color: #ffffff; width: 100%; max-width: 535px; box-sizing: border-box; margin: 0 auto; padding: 10px 15px;">
+      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%;">
+        
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #FF7A18; padding-bottom:14px; margin-bottom:18px;">
           <div>
             <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:20px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
@@ -55,6 +55,7 @@ function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, enginee
             Plant Supervisor Sign-off
           </div>
         </div>
+        
         <div style="margin-top:20px; font-size:9.5px; color:#999; border-top:1px solid #eee; padding-top:8px; page-break-inside: avoid; break-inside: avoid;">
           Al Gurg Automation &amp; Controls · ${esc(plantName || "")} · Generated offline-first via AGC SCADA OpsGuard PWA
         </div>
@@ -92,17 +93,16 @@ function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, enginee
     try {
       const html2pdf = await loadLib();
       
-      // Pass the raw HTML string directly into .from() — avoiding DOM attach/detach security issues
-     await html2pdf()
+      await html2pdf()
         .set({
-          margin: 24,
+          margin: [20, 20, 20, 20],
           filename: filename,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {  
             scale: 2,  
             useCORS: true,
-            letterRendering: true,
-            windowWidth: 535  // <--- CHANGE THIS FROM 760 TO 535
+            letterRendering: true
+            // Removed fixed windowWidth so html2canvas safely evaluates the container natively
           },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
