@@ -23,7 +23,7 @@ const PdfExport = (() => {
     return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
- function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
+  function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
     return `
@@ -60,6 +60,19 @@ const PdfExport = (() => {
     </div>`;
   }
 
+  function rowsToTable(headers, rows) {
+    const thead = `<tr>${headers.map((h) => `<th style="text-align:left; font-size:10px; letter-spacing:0.04em; color:#666; border-bottom:1px solid #ccc; padding:5px 6px;">${esc(h)}</th>`).join("")}</tr>`;
+    const tbody = rows
+      .map(
+        (r) =>
+          `<tr>${r
+            .map((cell) => `<td style="padding:5px 6px; border-bottom:1px solid #eee; font-size:11px;">${esc(cell)}</td>`)
+            .join("")}</tr>`
+      )
+      .join("");
+    return `<table style="width:100%; border-collapse:collapse; margin:8px 0 14px;">${thead}${tbody}</table>`;
+  }
+
   function checklistToHtml(steps, checkedMap) {
     return `<div>${steps
       .map((s, i) => {
@@ -73,13 +86,12 @@ const PdfExport = (() => {
       .join("")}</div>`;
   }
 
-async function exportHtml(html, filename) {
+  async function exportHtml(html, filename) {
     try {
       const html2pdf = await loadLib();
       
       await html2pdf()
         .set({
-          // FIX: Use an explicit margin array [top, right, bottom, left] to eliminate the top gap
           margin: [15, 20, 15, 20], 
           filename: filename,
           image: { type: "jpeg", quality: 0.98 },
@@ -87,7 +99,7 @@ async function exportHtml(html, filename) {
             scale: 2,  
             useCORS: true,
             letterRendering: true,
-            windowWidth: 555 // Perfect fit for A4 printable width
+            windowWidth: 555
           },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
