@@ -15,6 +15,7 @@ const SHELL_ASSETS = [
   "./js/db.js",
   "./js/seed-data.js",
   "./js/pdf-export.js",
+  "./js/badge.js",
   "./js/app.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -43,8 +44,8 @@ self.addEventListener("activate", (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // 1. Ignore non-http requests (e.g., chrome-extension://)
-  if (!request.url.startsWith('http')) {
+  // 1. Ignore non-http requests (e.g., chrome-extension://, file://) and non-GET methods
+  if (!request.url.startsWith('http') || request.method !== 'GET') {
     return;
   }
 
@@ -66,7 +67,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Cross-origin (CDNs, fonts, html2pdf): stale-while-revalidate
+  // 3. Cross-origin (CDNs, fonts, html2pdf.js): stale-while-revalidate
   event.respondWith(
     caches.open(RUNTIME_CACHE).then(async (cache) => {
       const cached = await cache.match(request);
