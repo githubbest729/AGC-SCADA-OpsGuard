@@ -23,57 +23,41 @@ const PdfExport = (() => {
     return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
+ function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
-    // FIX: Use max-width with 100% and safe padding to prevent edge clipping on A4
     return `
-    <div style="background-color: #ffffff; width: 100%; max-width: 535px; box-sizing: border-box; margin: 0 auto; padding: 10px 15px;">
-      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%;">
-        
-        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #FF7A18; padding-bottom:14px; margin-bottom:18px;">
+    <div style="background-color: #ffffff; width: 535px; box-sizing: border-box; margin: 0 auto; padding: 0;">
+      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%; padding:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #FF7A18; padding-bottom:8px; margin-bottom:12px;">
           <div>
-            <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:20px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
-            <div style="font-size:10.5px; letter-spacing:0.08em; color:#666; margin-top:2px;">INSTRUMENTATION &amp; CONTROL — SCADA COMPLIANCE REPORT</div>
+            <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:18px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
+            <div style="font-size:9.5px; letter-spacing:0.08em; color:#666; margin-top:1px;">INSTRUMENTATION &amp; CONTROL — SCADA COMPLIANCE REPORT</div>
           </div>
-          <div style="text-align:right; font-size:10.5px; color:#666;">
+          <div style="text-align:right; font-size:9.5px; color:#666;">
             <div>Generated: ${esc(today)}</div>
             <div>System: AGC SCADA OpsGuard</div>
           </div>
         </div>
 
-        <h1 style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:18px; margin:0 0 2px;">${esc(reportTitle)}</h1>
-        <div style="font-size:11.5px; color:#555; margin-bottom:14px;">${esc(reportMeta)}</div>
+        <h1 style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:16px; margin:0 0 2px;">${esc(reportTitle)}</h1>
+        <div style="font-size:10.5px; color:#555; margin-bottom:10px;">${esc(reportMeta)}</div>
 
-        <div style="font-size:12.5px; line-height:1.5;">${bodyHtml}</div>
+        <div style="font-size:11.5px; line-height:1.4;">${bodyHtml}</div>
 
-        <div style="margin-top:30px; display:flex; gap:30px; page-break-inside: avoid; break-inside: avoid;">
-          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:10.5px; color:#555;">
+        <div style="margin-top:20px; display:flex; gap:30px; page-break-inside: avoid; break-inside: avoid;">
+          <div style="flex:1; border-top:1px solid #999; padding-top:4px; font-size:10px; color:#555;">
             Engineer Sign-off — ${esc(engineerName || "")}${engineerRole ? ", " + esc(engineerRole) : ""}
           </div>
-          <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:10.5px; color:#555;">
+          <div style="flex:1; border-top:1px solid #999; padding-top:4px; font-size:10px; color:#555;">
             Plant Supervisor Sign-off
           </div>
         </div>
-        
-        <div style="margin-top:20px; font-size:9.5px; color:#999; border-top:1px solid #eee; padding-top:8px; page-break-inside: avoid; break-inside: avoid;">
+        <div style="margin-top:14px; font-size:9px; color:#999; border-top:1px solid #eee; padding-top:6px; page-break-inside: avoid; break-inside: avoid;">
           Al Gurg Automation &amp; Controls · ${esc(plantName || "")} · Generated offline-first via AGC SCADA OpsGuard PWA
         </div>
       </div>
     </div>`;
-  }
-
-  function rowsToTable(headers, rows) {
-    const thead = `<tr>${headers.map((h) => `<th style="text-align:left; font-size:10.5px; letter-spacing:0.04em; color:#666; border-bottom:1px solid #ccc; padding:6px 8px;">${esc(h)}</th>`).join("")}</tr>`;
-    const tbody = rows
-      .map(
-        (r) =>
-          `<tr>${r
-            .map((cell) => `<td style="padding:6px 8px; border-bottom:1px solid #eee; font-size:12px;">${esc(cell)}</td>`)
-            .join("")}</tr>`
-      )
-      .join("");
-    return `<table style="width:100%; border-collapse:collapse; margin:10px 0 18px;">${thead}${tbody}</table>`;
   }
 
   function checklistToHtml(steps, checkedMap) {
@@ -81,9 +65,9 @@ const PdfExport = (() => {
       .map((s, i) => {
         const id = s.id || i;
         const checked = checkedMap ? !!checkedMap[id] : false;
-        return `<div style="display:flex; gap:8px; padding:5px 0; border-bottom:1px solid #f0f0f0;">
-          <div style="width:14px; height:14px; border:1.5px solid #999; margin-top:1px; flex:none; ${checked ? "background:#FF7A18; border-color:#FF7A18;" : ""}"></div>
-          <div style="font-size:12.5px; ${checked ? "" : "color:#333;"}">${esc(s.text || s)}</div>
+        return `<div style="display:flex; gap:6px; padding:3px 0; border-bottom:1px solid #f0f0f0;">
+          <div style="width:12px; height:12px; border:1.2px solid #999; margin-top:1px; flex:none; ${checked ? "background:#FF7A18; border-color:#FF7A18;" : ""}"></div>
+          <div style="font-size:11px; ${checked ? "" : "color:#333;"}">${esc(s.text || s)}</div>
         </div>`;
       })
       .join("")}</div>`;
