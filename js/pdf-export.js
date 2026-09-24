@@ -86,13 +86,14 @@ const PdfExport = (() => {
       .join("")}</div>`;
   }
 
-  async function exportHtml(html, filename) {
+async function exportHtml(html, filename) {
     try {
       const html2pdf = await loadLib();
       
       await html2pdf()
         .set({
-          margin: [15, 20, 15, 20], 
+          // FIX: Reduced top/bottom margins from 15 to 10 to make room for photo/remarks
+          margin: [10, 15, 10, 15], 
           filename: filename,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {  
