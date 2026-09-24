@@ -51,16 +51,15 @@ erDiagram
 
 ## 💻 Tech Stack & Folder Structure
 
+*   **Frontend:** Vanilla JavaScript, HTML5, CSS3 *(No build step, no framework)*.
+*   **Storage:** IndexedDB for secure, local offline data.
+*   **PWA Layer:** Service Worker with app-shell precache + runtime CDN caching.
+*   **Reporting:** `html2pdf.js` loaded via CDN (falls back to native browser print if fully offline on first use).
 
-Frontend: Vanilla JavaScript, HTML5, CSS3 (No build step, no framework).
+<details>
+<summary><strong>📁 Click to expand the repository structure</strong></summary>
 
-Storage: IndexedDB for secure, local offline data.
-
-PWA Layer: Service Worker with app-shell precache + runtime CDN caching.
-
-Reporting: html2pdf.js loaded via CDN (falls back to native browser print if fully offline on first use).
-
-
+```text
 agc-scada-opsguard/
 ├── index.html          # App shell, hash-router mounts views into #view
 ├── offline.html        # Fallback page served by the service worker
@@ -74,6 +73,37 @@ agc-scada-opsguard/
 │   └── app.js          # Router + all views + CRUD logic
 ├── icons/              # App icons (all manifest sizes) + favicon
 └── social/             # Social sharing / announcement image assets
+```
+</details>
+
+---
+
+## 🚀 Installation & Deployment
+
+### Run it Locally
+Any static file server works. Note: A service worker requires `http://` or `https://` (it will not work directly from a `file://` URL).
+
+```bash
+cd agc-scada-opsguard
+python3 -m http.server 8080
+# Open http://localhost:8080 in your browser
+```
+
+### Production Deployment
+Upload the folder as-is to any static host (GitHub Pages, Netlify, or an internal IIS/nginx server). **No server-side code or cloud database is required.**
+
+### Install on a Device
+1. Open the site in Chrome/Edge (Desktop/Android) or Safari (iOS/iPadOS).
+2. Select **"Install app"** or **"Add to Home Screen"**.
+3. OpsGuard will launch full-screen as a native application, retaining full functionality with zero signal.
+
+---
+
+> [!NOTE]
+> **Application Notes & Maintenance**
+> *   **Demo Data:** The first run seeds a baseline dataset (sample PLC/HMI registry, version matrix, security checklist, and a Weekly SCADA Health Check). You can reset this anytime via **Settings → Reset demo data**.
+> *   **Data Backups:** Use **Settings → Export all data (JSON)** to create a full local backup of your IndexedDB environment.
+> *   **Branding:** Replace `icons/icon-master.svg` and `social/*.svg` with your own artwork to override the default dark/amber SCADA theme.
 
 🚀 Installation & Deployment
 Run it Locally
