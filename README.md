@@ -29,21 +29,19 @@
 *   🔐 **Cybersecurity & Access Audits:** Hardening checklists and default-password audit logs.
 *   📜 **License Tracking:** Monitor software support expirations and SSL certificate validity.
 *   ✅ **Backup Verification:** Cryptographic hash and success/failure logging for disaster recovery archives.
-*   📄 **Compliance PDF Exports:** One-click, branded PDF reports generated entirely client-side.
+*   📄 **Compliance PDF Exports:** One-click, branded PDF reports generated entirely client-side using `html2pdf.js`.
 
 ---
 
-## 📊 System Architecture
+## 🗄️ Database Schema (IndexedDB)
+
+The local data model utilizes a multi-store approach to keep maintenance logic separated from physical asset tracking. *See `js/db.js` for the exact schema.*
 
 ```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#111827', 'primaryTextColor': '#f3f4f6', 'primaryBorderColor': '#f59e0b', 'lineColor': '#f59e0b', 'secondaryColor': '#1f2937', 'tertiaryColor': '#030712'}}}%%
-graph TD
-    A[Field Engineer] -->|Offline Access| B(OpsGuard PWA)
-    B -->|Read/Write| C{IndexedDB}
-    
-    C --> D[⚙️ Equipment Registry]
-    C --> E[📋 PM Checklists]
-    C --> F[🛡️ Security Audits]
-    
-    B -->|Generate| G[📄 Branded PDF Export]
-    G -->|html2pdf.js| H[Compliance Report]
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#111827', 'primaryBorderColor': '#f59e0b'}}}%%
+erDiagram
+    EQUIPMENT ||--o{ VERSIONS : tracks
+    EQUIPMENT ||--o{ LICENSES : holds
+    EQUIPMENT ||--o{ BACKUPS : verified_by
+    PM_TEMPLATES ||--o{ PM_RUNS : instantiates
+    SECURITY_CHECKS ||--o{ SECURITY_RUNS : guides
