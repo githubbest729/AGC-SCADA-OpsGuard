@@ -424,19 +424,19 @@ async function renderPmRun(runId) {
 async function exportPmRunPdf(run, template) {
   const stepsHtml = PdfExport.checklistToHtml(template.steps.map((s, i) => ({ id: i, text: s })), run.checks);
   
-  // FIXED: Added strict height boundaries and clean page-break containment
+  // Compacted image height so it fits on page 1 alongside checklist & remarks
   const photoHtml = run.photoBase64 
-    ? `<div style="margin-top:20px; page-break-inside: avoid; break-inside: avoid;">
-         <strong>Photo Evidence:</strong><br/>
-         <img src="${run.photoBase64}" style="max-width: 280px; max-height: 260px; width: auto; height: auto; display: block; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+    ? `<div style="margin-top:12px; page-break-inside: avoid; break-inside: avoid;">
+         <strong style="font-size:11px;">Photo Evidence:</strong><br/>
+         <img src="${run.photoBase64}" style="max-width: 240px; max-height: 180px; width: auto; height: auto; display: block; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px;" />
        </div>` 
     : '';
   
   const body = `
     ${stepsHtml}
-    <div style="margin-top:16px; page-break-inside: avoid; break-inside: avoid;">
-      <strong>Remarks / anomalies:</strong>
-      <div style="margin-top:4px; white-space:pre-wrap;">${esc(run.remarks) || "None recorded."}</div>
+    <div style="margin-top:12px; page-break-inside: avoid; break-inside: avoid;">
+      <strong style="font-size:11px;">Remarks / anomalies:</strong>
+      <div style="margin-top:2px; font-size:11px; white-space:pre-wrap;">${esc(run.remarks) || "None recorded."}</div>
     </div>
     ${photoHtml}
   `;
