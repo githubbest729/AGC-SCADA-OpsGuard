@@ -27,10 +27,10 @@ const PdfExport = (() => {
   function buildLetterhead({ plantName, reportTitle, reportMeta, bodyHtml, engineerName, engineerRole }) {
     const today = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
     
-    // Wrapped in a master container with white background to ensure the PDF isn't transparent
+    // FIX: Removed height: 100% and width: 100% stretching. Set a fixed 760px print canvas.
     return `
-    <div style="background-color: #ffffff; width: 100%; height: 100%; box-sizing: border-box;">
-      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:760px; padding:0;">
+    <div style="background-color: #ffffff; width: 760px; box-sizing: border-box; margin: 0 auto; padding: 0;">
+      <div style="font-family: 'IBM Plex Sans', Arial, sans-serif; color:#151515; width:100%; padding:0;">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #FF7A18; padding-bottom:14px; margin-bottom:18px;">
           <div>
             <div style="font-family:'Oswald', Arial Narrow, sans-serif; font-size:22px; font-weight:600; letter-spacing:0.03em;">AL GURG AUTOMATION &amp; CONTROLS</div>
@@ -47,7 +47,7 @@ const PdfExport = (() => {
 
         <div style="font-size:13px; line-height:1.55;">${bodyHtml}</div>
 
-        <div style="margin-top:34px; display:flex; gap:40px;">
+        <div style="margin-top:34px; display:flex; gap:40px; page-break-inside: avoid; break-inside: avoid;">
           <div style="flex:1; border-top:1px solid #999; padding-top:6px; font-size:11px; color:#555;">
             Engineer Sign-off — ${esc(engineerName || "")}${engineerRole ? ", " + esc(engineerRole) : ""}
           </div>
@@ -55,7 +55,7 @@ const PdfExport = (() => {
             Plant Supervisor Sign-off
           </div>
         </div>
-        <div style="margin-top:24px; font-size:10px; color:#999; border-top:1px solid #eee; padding-top:8px;">
+        <div style="margin-top:24px; font-size:10px; color:#999; border-top:1px solid #eee; padding-top:8px; page-break-inside: avoid; break-inside: avoid;">
           Al Gurg Automation &amp; Controls · ${esc(plantName || "")} · Generated offline-first via AGC SCADA OpsGuard PWA
         </div>
       </div>
@@ -92,7 +92,6 @@ const PdfExport = (() => {
     try {
       const html2pdf = await loadLib();
       
-      // We pass the raw HTML string directly. No DOM appending!
       await html2pdf()
         .set({
           margin: 24,
@@ -106,12 +105,11 @@ const PdfExport = (() => {
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ['css', 'legacy'] }
         })
-        .from(html) // Pass the string here
+        .from(html)
         .save();
         
     } catch (err) {
       console.warn("PDF export failed, falling back to print dialog:", err);
-      // Offline / CDN unreachable fallback: open a printable window
       const win = window.open("", "_blank");
       win.document.write(`<html><head><title>${esc(filename)}</title></head><body style="background:#fff;">${html}</body></html>`);
       win.document.close();
