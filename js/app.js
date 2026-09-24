@@ -424,19 +424,19 @@ async function renderPmRun(runId) {
 async function exportPmRunPdf(run, template) {
   const stepsHtml = PdfExport.checklistToHtml(template.steps.map((s, i) => ({ id: i, text: s })), run.checks);
   
-  // REMOVED rigid page-break-inside: avoid so items can flow naturally to page 2 if needed
+  // Compacted photo height so it fits comfortably on page 1 alongside checklists and remarks
   const photoHtml = run.photoBase64 
-    ? `<div style="margin-top: 14px;">
-         <strong style="font-size: 11px; display: block; margin-bottom: 4px;">Photo Evidence:</strong>
-         <img src="${run.photoBase64}" style="max-width: 260px; max-height: 200px; width: auto; height: auto; display: block; border: 1px solid #ccc; border-radius: 4px;" />
+    ? `<div style="margin-top: 8px;">
+         <strong style="font-size: 10.5px; display: block; margin-bottom: 2px;">Photo Evidence:</strong>
+         <img src="${run.photoBase64}" style="max-width: 220px; max-height: 140px; width: auto; height: auto; display: block; border: 1px solid #ccc; border-radius: 4px;" />
        </div>` 
     : '';
   
   const body = `
     ${stepsHtml}
-    <div style="margin-top: 14px;">
-      <strong style="font-size: 11px; display: block; margin-bottom: 2px;">Remarks / anomalies:</strong>
-      <div style="font-size: 11px; white-space: pre-wrap; line-height: 1.4;">${esc(run.remarks) || "None recorded."}</div>
+    <div style="margin-top: 8px;">
+      <strong style="font-size: 10.5px; display: block; margin-bottom: 2px;">Remarks / anomalies:</strong>
+      <div style="font-size: 10.5px; white-space: pre-wrap; line-height: 1.3;">${esc(run.remarks) || "None recorded."}</div>
     </div>
     ${photoHtml}
   `;
